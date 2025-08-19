@@ -180,3 +180,16 @@ class TestDremio(Validator):
         self.validate_identity(
             "SELECT DATE_SUB(col, a, 'HOUR')", "SELECT TIMESTAMPADD(HOUR, a * -1, col)"
         )
+
+    def test_datetime_parsing(self):
+        ts = "CAST('2025-08-18 15:30:00' AS TIMESTAMP)"
+
+        self.validate_identity(
+            f"SELECT DATE_FORMAT({ts}, 'yyyy-mm-dd')",
+            f"SELECT TO_CHAR({ts}, 'yyyy-mm-dd')",
+        )
+
+        self.validate_all(
+            "SELECT DATE_FORMAT(CAST('2025-08-18 15:30:00' AS TIMESTAMP), 'yyyy-mm-dd')",
+            "SELECT TO_CHAR(CAST('2025-08-18 15:30:00' AS TIMESTAMP), 'yyyy-mm-dd')",
+        )
